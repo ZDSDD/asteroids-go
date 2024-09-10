@@ -1,11 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
+	"github.com/zdsdd/asteroids/internal/gamelogic"
 	"github.com/zdsdd/asteroids/internal/gameobjects"
 )
 
@@ -15,29 +14,22 @@ type Game struct {
 }
 
 func (g *Game) Update() error {
-	// Check if the left mouse button was pressed
-	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
-		x, y := ebiten.CursorPosition()
-		fmt.Printf("Mouse clicked at: X: %d, Y: %d\n", x, y)
-		g.asteroids[0].CircleShape.X, g.asteroids[0].Y = float32(x), float32(y)
-	}
-	// deltaTime := 1.0 / ebiten.ActualTPS()
 	for _, v := range g.asteroids {
 		v.Update()
 	}
-
 	g.player.Update()
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	// Draw a red rectangle
-	g.asteroids[0].Draw(screen)
+	for _, v := range g.asteroids {
+		v.Draw(screen)
+	}
 	g.player.Draw(screen)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
-	return 640, 480 // Set the game window size
+	return gamelogic.SCREEN_WIDTH, gamelogic.SCREEN_HEIGHT // Set the game window size
 }
 
 func newGame() *Game {
@@ -66,7 +58,7 @@ func newGame() *Game {
 }
 
 func main() {
-	ebiten.SetWindowSize(640, 480)
+	ebiten.SetWindowSize(gamelogic.SCREEN_WIDTH, gamelogic.SCREEN_HEIGHT)
 	ebiten.SetWindowTitle("Asteroid")
 	ebiten.SetVsyncEnabled(true)
 

@@ -8,13 +8,13 @@ type Drawable interface {
 	Draw(*ebiten.Image)
 }
 
-type Updateable interface {
+type Updatable interface {
 	Update()
 }
 
 type GameObject interface {
 	Drawable
-	Updateable
+	Updatable
 }
 
 type Vec2_64 struct {
