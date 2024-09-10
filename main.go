@@ -59,10 +59,12 @@ func newGame() *Game {
 	}
 
 	player := &gameobjects.Player{
-		Position: gameobjects.Vec2_64{X: 320, Y: 240}, // Start position at the center
-		Base:     40,
-		Height:   60,
-		Speed:    2, // Player movement speed
+		TriangleShape: gameobjects.TriangleShape{
+			Position: gameobjects.Vec2_64{X: 320, Y: 240}, // Start position at the center
+			Base:     40,
+			Height:   60,
+		},
+		Speed: 2, // Player movement speed
 	}
 	return &Game{
 		asteroids: asteroids,

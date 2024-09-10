@@ -9,10 +9,8 @@ import (
 
 // Player represents an isosceles triangle-shaped player
 type Player struct {
-	Position Vec2_64 // Position of the player (center of the base of the triangle)
-	Base     float64 // Length of the base of the triangle
-	Height   float64 // Height of the triangle
-	Speed    float64 // Movement speed
+	TriangleShape
+	Speed float64 // Movement speed
 }
 
 // Update method for the Player to move it based on keyboard input
