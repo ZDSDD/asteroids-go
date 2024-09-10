@@ -13,7 +13,7 @@ type Player struct {
 }
 
 // Update method for the Player to move and rotate based on input
-func (p *Player) Update() {
+func (p *Player) Update() error {
 	// The forward vector should point towards the player's head (the apex of the triangle)
 	// Calculate forward direction using the rotation angle
 	// The forward vector is aligned with the player's "head" point (apex of the triangle)
@@ -37,6 +37,7 @@ func (p *Player) Update() {
 	if ebiten.IsKeyPressed(ebiten.KeyRight) {
 		p.Rotation += 0.05 // Rotate right (clockwise)
 	}
+	return nil
 }
 
 // Draw method for the Player (draws an isosceles triangle)

@@ -9,23 +9,23 @@ import (
 )
 
 type Game struct {
-	asteroids []*gameobjects.Asteroid
-	player    *gameobjects.Player
+	gameObjects []gameobjects.GameObject
 }
 
 func (g *Game) Update() error {
-	for _, v := range g.asteroids {
-		v.Update()
+	for _, v := range g.gameObjects {
+		err := v.Update()
+		if err != nil {
+			return err
+		}
 	}
-	g.player.Update()
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	for _, v := range g.asteroids {
+	for _, v := range g.gameObjects {
 		v.Draw(screen)
 	}
-	g.player.Draw(screen)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
@@ -38,10 +38,6 @@ func newGame() *Game {
 		Velocity:    gameobjects.Vec2{X: 2, Y: 1}, // Move right and slightly down
 	}
 
-	asteroids := []*gameobjects.Asteroid{
-		asteroid,
-	}
-
 	player := &gameobjects.Player{
 		TriangleShape: gameobjects.TriangleShape{
 			Position: gameobjects.Vec2{X: 320, Y: 240}, // Start position at the center
@@ -52,8 +48,9 @@ func newGame() *Game {
 		Speed: 2, // Player movement speed
 	}
 	return &Game{
-		asteroids: asteroids,
-		player:    player,
+		gameObjects: []gameobjects.GameObject{
+			asteroid, player,
+		},
 	}
 }
 

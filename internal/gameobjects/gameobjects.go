@@ -9,7 +9,7 @@ type Drawable interface {
 }
 
 type Updatable interface {
-	Update()
+	Update() error
 }
 
 type GameObject interface {

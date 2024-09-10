@@ -11,7 +11,8 @@ func (ast *Asteroid) Draw(dest *ebiten.Image) {
 	ast.CircleShape.Draw(dest)
 }
 
-func (a *Asteroid) Update() {
+func (a *Asteroid) Update() error {
 	a.CircleShape.X += a.Velocity.X
 	a.CircleShape.Y += a.Velocity.Y
+	return nil
 }
