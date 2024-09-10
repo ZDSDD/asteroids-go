@@ -51,7 +51,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 func newGame() *Game {
 	asteroid := &gameobjects.Asteroid{
 		CircleShape: gameobjects.CircleShape{X: 100, Y: 100, Radius: 50},
-		Velocity:    gameobjects.Vec2_32{X: 2, Y: 1}, // Move right and slightly down
+		Velocity:    gameobjects.Vec2{X: 2, Y: 1}, // Move right and slightly down
 	}
 
 	asteroids := []*gameobjects.Asteroid{
@@ -60,7 +60,7 @@ func newGame() *Game {
 
 	player := &gameobjects.Player{
 		TriangleShape: gameobjects.TriangleShape{
-			Position: gameobjects.Vec2_64{X: 320, Y: 240}, // Start position at the center
+			Position: gameobjects.Vec2{X: 320, Y: 240}, // Start position at the center
 			Base:     40,
 			Height:   60,
 		},

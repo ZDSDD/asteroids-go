@@ -4,7 +4,7 @@ import "github.com/hajimehoshi/ebiten/v2"
 
 type Asteroid struct {
 	CircleShape
-	Velocity Vec2_32
+	Velocity Vec2
 }
 
 func (ast *Asteroid) Draw(dest *ebiten.Image) {

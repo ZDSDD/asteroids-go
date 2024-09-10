@@ -21,6 +21,6 @@ type Vec2_64 struct {
 	X, Y float64
 }
 
-type Vec2_32 struct {
+type Vec2 struct {
 	X, Y float32
 }

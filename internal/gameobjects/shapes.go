@@ -16,7 +16,7 @@ func (cs *CircleShape) Draw(dest *ebiten.Image) {
 }
 
 type TriangleShape struct {
-	Position Vec2_64 // Position of the player (center of the base of the triangle)
-	Base     float64 // Length of the base of the triangle
-	Height   float64 // Height of the triangle
+	Position Vec2    // Position of the player (center of the base of the triangle)
+	Base     float32 // Length of the base of the triangle
+	Height   float32 // Height of the triangle
 }
