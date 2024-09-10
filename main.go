@@ -2,12 +2,10 @@ package main
 
 import (
 	"fmt"
-	"image/color"
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
-	"github.com/hajimehoshi/ebiten/v2/vector"
 	"github.com/zdsdd/asteroids/internal/gameobjects"
 )
 
@@ -38,12 +36,6 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	g.player.Draw(screen)
 }
 
-// Draw a triangle using three points
-func drawTriangle(screen *ebiten.Image, x1, y1, x2, y2, x3, y3 int, clr color.Color) {
-	vector.StrokeLine(screen, float32(x1), float32(y1), float32(x2), float32(y2), 4, clr, false)
-	vector.StrokeLine(screen, float32(x2), float32(y2), float32(x3), float32(y3), 4, clr, false)
-	vector.StrokeLine(screen, float32(x3), float32(y3), float32(x1), float32(y1), 4, clr, false)
-}
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	return 640, 480 // Set the game window size
 }
@@ -63,6 +55,7 @@ func newGame() *Game {
 			Position: gameobjects.Vec2{X: 320, Y: 240}, // Start position at the center
 			Base:     40,
 			Height:   60,
+			Rotation: 180,
 		},
 		Speed: 2, // Player movement speed
 	}
@@ -74,7 +67,7 @@ func newGame() *Game {
 
 func main() {
 	ebiten.SetWindowSize(640, 480)
-	ebiten.SetWindowTitle("Mouse Click Example")
+	ebiten.SetWindowTitle("Asteroid")
 	ebiten.SetVsyncEnabled(true)
 
 	game := newGame()
