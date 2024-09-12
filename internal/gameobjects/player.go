@@ -5,6 +5,7 @@ import (
 	"image/color"
 	"math"
 	"math/rand"
+	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/zdsdd/asteroids/internal/constants"
@@ -16,12 +17,14 @@ const (
 
 // Player represents an isosceles triangle-shaped player
 type Player struct {
-	shape           TriangleShape
-	Velocity        Vec2 // Movement speed
 	AcceleratePower float32
 	DeceleratePower float32
+	shape           TriangleShape
+	Velocity        Vec2 // Movement speed
 	trailBubbles    []*trailBubble
 	Collider        CircleShape
+	Bullets         []*Bullet
+	LastTimeShoot   time.Time
 }
 
 func (p *Player) spawnTrail() {
@@ -114,20 +117,40 @@ func (p *Player) Update() error {
 			return err
 		}
 	}
+
+	for _, v := range p.Bullets {
+		if err := v.Update(); err != nil {
+			return err
+		}
+	}
+
 	if ebiten.IsKeyPressed(ebiten.KeyEscape) {
 		return fmt.Errorf("escape key pressed")
 	}
+	if ebiten.IsKeyPressed(ebiten.KeySpace) {
+		if time.Since(p.LastTimeShoot).Seconds() >= constants.SHOOTING_COOLDOWN {
+			p.Bullets = append(p.Bullets, p.spawnBullet())
+		}
+	}
+
 	return nil
 }
 
-func (p *Player) handleMovement() {
+func (p *Player) getForwardVector() Vec2 {
+
 	forwardX := float32(math.Sin(float64(p.shape.Rotation)))
 	forwardY := -float32(math.Cos(float64(p.shape.Rotation)))
+	return Vec2{X: forwardX, Y: forwardY}
+}
+
+func (p *Player) handleMovement() {
+
+	forwardVector := p.getForwardVector()
 
 	if ebiten.IsKeyPressed(ebiten.KeyUp) || ebiten.IsKeyPressed(ebiten.KeyW) {
 
-		p.Velocity.X += forwardX * p.AcceleratePower
-		p.Velocity.Y += forwardY * p.AcceleratePower
+		p.Velocity.X += forwardVector.X * p.AcceleratePower
+		p.Velocity.Y += forwardVector.Y * p.AcceleratePower
 		p.spawnTrail()
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyDown) || ebiten.IsKeyPressed(ebiten.KeyS) {
@@ -160,6 +183,9 @@ func (p *Player) Draw(screen *ebiten.Image) {
 		v.shape.Draw(screen)
 	}
 	p.Collider.Draw(screen)
+	for _, v := range p.Bullets {
+		v.Draw(screen)
+	}
 }
 
 // Function to handle bouncing at the screen edges
@@ -173,4 +199,33 @@ func bounceBack(position *Vec2, velocity *Vec2, screenWidth, screenHeight float3
 		velocity.Y = -velocity.Y
 		position.Y = 0
 	}
+}
+
+type Bullet = Asteroid
+
+func (p *Player) spawnBullet() *Bullet {
+	fmt.Println("Spawned bulled!!")
+	p.LastTimeShoot = time.Now()
+	shotVector := p.getForwardVector()
+	shotVector.X *= constants.BULLET_SPEED
+	shotVector.Y *= constants.BULLET_SPEED
+
+	return &Bullet{
+		CircleShape: CircleShape{
+			Shape: Shape{
+				Position: Vec2{
+					X: p.shape.Position.X,
+					Y: p.shape.Position.Y,
+				},
+				StrokeWidth: 1,
+				Color:       color.RGBA{100, 10, 200, 255},
+			},
+			Radius: 5,
+		},
+		Velocity: shotVector,
+	}
+}
+
+func (p *Player) GetBullets() []*Bullet {
+	return p.Bullets
 }

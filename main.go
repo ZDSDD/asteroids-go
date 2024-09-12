@@ -33,29 +33,6 @@ func (g *Game) Update() error {
 	return nil
 }
 
-type GameManager struct {
-	player    *gameobjects.Player
-	asteroids *[]*gameobjects.Asteroid
-}
-
-func (gm *GameManager) Update() error {
-	for _, v := range *gm.asteroids {
-		distanceBetweenCenters := gameobjects.Distance(gm.player.Collider.Position, v.Collider.Position)
-		sumOfRadiuses := gm.player.Collider.Radius + v.Collider.Radius
-		if distanceBetweenCenters < sumOfRadiuses {
-			fmt.Println("Collision detected with ", v)
-		}
-	}
-	return nil
-}
-
-func NewGameManager(p *gameobjects.Player, ast *[]*gameobjects.Asteroid) *GameManager {
-	return &GameManager{
-		player:    p,
-		asteroids: ast,
-	}
-}
-
 func (g *Game) Draw(screen *ebiten.Image) {
 	for _, v := range g.gameObjects {
 		v.Draw(screen)
@@ -69,7 +46,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 func newGame() *Game {
 	player := gameobjects.NewPlayer(320, 240, 40, 60, 0.04, 0.02, gameobjects.Vec2{X: 0, Y: 0})
 	asteroidManager := managers.NewAsteroidManager()
-	gameManager := NewGameManager(player, asteroidManager.GetAsteroids())
+	gameManager := managers.NewGameManager(player, asteroidManager.GetAsteroids(), nil)
 	return &Game{
 		gameObjects: []gameobjects.GameObject{
 			player, asteroidManager,
