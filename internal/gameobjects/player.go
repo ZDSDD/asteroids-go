@@ -1,6 +1,7 @@
 package gameobjects
 
 import (
+	"image/color"
 	"math"
 	"math/rand"
 
@@ -24,7 +25,6 @@ type Player struct {
 func (p *Player) spawnTrail() {
 	onDeath := func(tb *trailBubble) error {
 		bubbles := make([]*trailBubble, 0, maxTrailBubbles)
-		// Remove bubble from the list here
 		for i, bubble := range p.trailBubbles {
 			if bubble != tb {
 				bubbles = append(bubbles, p.trailBubbles[i])
@@ -33,13 +33,34 @@ func (p *Player) spawnTrail() {
 		p.trailBubbles = bubbles
 		return nil
 	}
-	forwardX := float32(math.Sin(float64(p.shape.Rotation)))
-	forwardY := -float32(math.Cos(float64(p.shape.Rotation)))
-	vel := Vec2{
-		X: -forwardX * float32(rand.Float32()*3),
-		Y: -forwardY * float32(rand.Float32()*3),
+	// Set up a random generator, if not done already
+
+	// Generate a random value between -0.5 and 0.5
+	randomOffset := (rand.Float32() - 0.5) * p.shape.Base
+
+	// Calculate the base center of the triangle (unchanged)
+	baseCenter := Vec2{
+		X: p.shape.Position.X - float32(math.Sin(float64(p.shape.Rotation)))*(p.shape.Height/2),
+		Y: p.shape.Position.Y + float32(math.Cos(float64(p.shape.Rotation)))*(p.shape.Height/2),
 	}
-	bubble := NewTrailBubble(p.shape.Position.X, p.shape.Position.Y, vel, onDeath)
+
+	// Calculate the random point along the base using trigonometric rotation
+	spawnPoint := Vec2{
+		X: baseCenter.X + float32(math.Cos(float64(p.shape.Rotation)))*randomOffset,
+		Y: baseCenter.Y + float32(math.Sin(float64(p.shape.Rotation)))*randomOffset,
+	}
+
+	// Calculate velocity perpendicular to the base
+	perpX := -float32(math.Sin(float64(p.shape.Rotation)) * 3)
+	perpY := float32(math.Cos(float64(p.shape.Rotation)) * 3)
+
+	vel := Vec2{
+		X: perpX,
+		Y: perpY,
+	}
+
+	bubble := NewTrailBubble(spawnPoint.X, spawnPoint.Y, vel, onDeath)
+
 	if len(p.trailBubbles) == maxTrailBubbles {
 		// Remove the oldest bubble and add the new one
 		p.trailBubbles = append(p.trailBubbles[1:], bubble)
@@ -52,9 +73,16 @@ func (p *Player) spawnTrail() {
 func NewPlayer(x, y, base, height, acceleratePower, deceleratePower float32, velocity Vec2) *Player {
 	player := &Player{
 		shape: TriangleShape{
-			Position: Vec2{X: x, Y: y},
-			Base:     base,
-			Height:   height,
+			Shape: Shape{
+				Position: Vec2{
+					X: x,
+					Y: y,
+				},
+				StrokeWidth: 1,
+				Color:       color.RGBA{255, 255, 255, 255},
+			},
+			Base:   base,
+			Height: height,
 		},
 		Velocity:        Vec2{X: 0, Y: 0},
 		AcceleratePower: acceleratePower,

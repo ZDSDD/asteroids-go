@@ -19,11 +19,15 @@ type trailBubble struct {
 func NewTrailBubble(x, y float32, vel Vec2, onDeathFunc OnDeathFunc) *trailBubble {
 	return &trailBubble{
 		shape: &CircleShape{
-			X:           x, // Initial position same as player
-			Y:           y,
-			Radius:      5 + float32(rand.Int()%3), // Example radius
-			StrokeWidth: 1,
-			Color:       color.RGBA{255, 255, 255, 200},
+			Shape: Shape{
+				Position: Vec2{
+					X: x, // Initial position same as player
+					Y: y,
+				},
+				StrokeWidth: 1,
+				Color:       color.RGBA{255, 255, 255, 200},
+			},
+			Radius: 5 + float32(rand.Int()%3), // Example radius
 		},
 		Velocity:  vel,
 		spawnTime: time.Now(),
@@ -52,8 +56,8 @@ func (tb *trailBubble) Update() error {
 	tb.shape.Color = color.RGBA{alpha, alpha, alpha, 255}
 
 	// Update position
-	tb.shape.X += tb.Velocity.X
-	tb.shape.Y += tb.Velocity.Y
+	tb.shape.Position.X += tb.Velocity.X
+	tb.shape.Position.Y += tb.Velocity.Y
 
 	// Check if the bubble should be removed
 	if timeSince >= tb.lifeTime {

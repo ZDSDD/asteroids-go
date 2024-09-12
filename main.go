@@ -1,7 +1,6 @@
 package main
 
 import (
-	"image/color"
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -34,15 +33,10 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 }
 
 func newGame() *Game {
-	asteroid := &gameobjects.Asteroid{
-		CircleShape: gameobjects.CircleShape{X: 100, Y: 100, Radius: 50, StrokeWidth: 1, Color: color.RGBA{255, 255, 255, 255}},
-		Velocity:    gameobjects.Vec2{X: 2, Y: 1}, // Move right and slightly down
-	}
-
 	player := gameobjects.NewPlayer(320, 240, 40, 60, 0.04, 0.02, gameobjects.Vec2{X: 0, Y: 0})
 	return &Game{
 		gameObjects: []gameobjects.GameObject{
-			asteroid, player,
+			player,
 		},
 	}
 }
