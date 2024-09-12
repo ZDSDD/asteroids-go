@@ -27,21 +27,41 @@ func NewTrailBubble(x, y float32, vel Vec2, onDeathFunc OnDeathFunc) *trailBubbl
 		},
 		Velocity:  vel,
 		spawnTime: time.Now(),
-		lifeTime:  3 * time.Second,
+		lifeTime:  1 * time.Second,
 		OnDeath:   onDeathFunc,
 	}
 }
 
 func (tb *trailBubble) Update() error {
+	timeSince := time.Since(tb.spawnTime)
+
+	// Calculate the remaining lifetime as a fraction
+	remainingLifeFraction := 1 - float64(timeSince)/float64(tb.lifeTime)
+
+	// Ensure the fraction is between 0 and 1
+	if remainingLifeFraction < 0 {
+		remainingLifeFraction = 0
+	} else if remainingLifeFraction > 1 {
+		remainingLifeFraction = 1
+	}
+
+	// Calculate alpha value (255 when new, approaching 0 as it ages)
+	alpha := uint8(255 * remainingLifeFraction)
+
+	// Update the color with the new alpha value
+	tb.shape.Color = color.RGBA{alpha, alpha, alpha, 255}
+
+	// Update position
 	tb.shape.X += tb.Velocity.X
 	tb.shape.Y += tb.Velocity.Y
-	if tb.OnDeath == nil {
+
+	// Check if the bubble should be removed
+	if timeSince >= tb.lifeTime {
+		if tb.OnDeath != nil {
+			return tb.OnDeath(tb)
+		}
 		return nil
 	}
-	timeSince := time.Since(tb.spawnTime)
-	// fmt.Printf("timeSince: %v, lifeTime:%v\n", timeSince.Seconds(), float64(tb.lifeTime))
-	if timeSince >= tb.lifeTime {
-		return tb.OnDeath(tb)
-	}
+
 	return nil
 }

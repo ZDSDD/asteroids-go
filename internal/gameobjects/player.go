@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	maxTrailBubbles = 1024
+	maxTrailBubbles = 64
 )
 
 // Player represents an isosceles triangle-shaped player
@@ -26,9 +26,6 @@ func (p *Player) spawnTrail() {
 		bubbles := make([]*trailBubble, 0, maxTrailBubbles)
 		// Remove bubble from the list here
 		for i, bubble := range p.trailBubbles {
-			if i >= maxTrailBubbles {
-				break
-			}
 			if bubble != tb {
 				bubbles = append(bubbles, p.trailBubbles[i])
 			}
@@ -36,16 +33,19 @@ func (p *Player) spawnTrail() {
 		p.trailBubbles = bubbles
 		return nil
 	}
-
 	forwardX := float32(math.Sin(float64(p.shape.Rotation)))
 	forwardY := -float32(math.Cos(float64(p.shape.Rotation)))
 	vel := Vec2{
-		X: -forwardX * float32(rand.Int()%3),
-		Y: -forwardY * float32(rand.Int()%3),
+		X: -forwardX * float32(rand.Float32()*3),
+		Y: -forwardY * float32(rand.Float32()*3),
 	}
 	bubble := NewTrailBubble(p.shape.Position.X, p.shape.Position.Y, vel, onDeath)
-	p.trailBubbles = append(p.trailBubbles, bubble)
-
+	if len(p.trailBubbles) == maxTrailBubbles {
+		// Remove the oldest bubble and add the new one
+		p.trailBubbles = append(p.trailBubbles[1:], bubble)
+	} else {
+		p.trailBubbles = append(p.trailBubbles, bubble)
+	}
 }
 
 // NewPlayer creates and initializes a new Player object.
