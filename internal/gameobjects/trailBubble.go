@@ -2,11 +2,8 @@ package gameobjects
 
 import (
 	"image/color"
+	"math/rand"
 	"time"
-)
-
-const (
-	maxTrailBubbles = 100
 )
 
 type OnDeathFunc func(tb *trailBubble) error
@@ -24,7 +21,7 @@ func NewTrailBubble(x, y float32, vel Vec2, onDeathFunc OnDeathFunc) *trailBubbl
 		shape: &CircleShape{
 			X:           x, // Initial position same as player
 			Y:           y,
-			Radius:      5, // Example radius
+			Radius:      5 + float32(rand.Int()%3), // Example radius
 			StrokeWidth: 1,
 			Color:       color.RGBA{255, 255, 255, 200},
 		},

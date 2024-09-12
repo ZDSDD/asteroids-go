@@ -1,11 +1,15 @@
 package gameobjects
 
 import (
-	"fmt"
 	"math"
+	"math/rand"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/zdsdd/asteroids/internal/gamelogic"
+)
+
+const (
+	maxTrailBubbles = 1024
 )
 
 // Player represents an isosceles triangle-shaped player
@@ -18,13 +22,13 @@ type Player struct {
 }
 
 func (p *Player) spawnTrail() {
-	if len(p.trailBubbles) == maxTrailBubbles {
-		return
-	}
 	onDeath := func(tb *trailBubble) error {
 		bubbles := make([]*trailBubble, 0, maxTrailBubbles)
 		// Remove bubble from the list here
 		for i, bubble := range p.trailBubbles {
+			if i >= maxTrailBubbles {
+				break
+			}
 			if bubble != tb {
 				bubbles = append(bubbles, p.trailBubbles[i])
 			}
@@ -33,7 +37,13 @@ func (p *Player) spawnTrail() {
 		return nil
 	}
 
-	bubble := NewTrailBubble(p.shape.Position.X, p.shape.Position.Y, p.Velocity, onDeath)
+	forwardX := float32(math.Sin(float64(p.shape.Rotation)))
+	forwardY := -float32(math.Cos(float64(p.shape.Rotation)))
+	vel := Vec2{
+		X: -forwardX * float32(rand.Int()%3),
+		Y: -forwardY * float32(rand.Int()%3),
+	}
+	bubble := NewTrailBubble(p.shape.Position.X, p.shape.Position.Y, vel, onDeath)
 	p.trailBubbles = append(p.trailBubbles, bubble)
 
 }
@@ -74,7 +84,6 @@ func (p *Player) handleMovement() {
 
 		p.Velocity.X += forwardX * p.AcceleratePower
 		p.Velocity.Y += forwardY * p.AcceleratePower
-		fmt.Println(len(p.trailBubbles))
 		p.spawnTrail()
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyDown) || ebiten.IsKeyPressed(ebiten.KeyS) {
@@ -111,9 +120,11 @@ func (p *Player) Draw(screen *ebiten.Image) {
 func bounceBack(position *Vec2, velocity *Vec2, screenWidth, screenHeight float32) {
 	if position.X <= 0 || position.X >= screenWidth {
 		velocity.X = -velocity.X
+		position.X = 0
 	}
 
 	if position.Y <= 0 || position.Y >= screenHeight {
 		velocity.Y = -velocity.Y
+		position.Y = 0
 	}
 }
