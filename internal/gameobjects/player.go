@@ -1,6 +1,7 @@
 package gameobjects
 
 import (
+	"fmt"
 	"image/color"
 	"math"
 	"math/rand"
@@ -113,6 +114,9 @@ func (p *Player) Update() error {
 			return err
 		}
 	}
+	if ebiten.IsKeyPressed(ebiten.KeyEscape) {
+		return fmt.Errorf("escape key pressed")
+	}
 	return nil
 }
 
@@ -141,7 +145,6 @@ func (p *Player) handleMovement() {
 
 		p.shape.Rotation += 0.05
 	}
-
 	p.shape.Position.X += p.Velocity.X
 	p.shape.Position.Y += p.Velocity.Y
 	p.Collider.Position.X = p.shape.Position.X
