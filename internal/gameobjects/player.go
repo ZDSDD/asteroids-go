@@ -20,6 +20,7 @@ type Player struct {
 	AcceleratePower float32
 	DeceleratePower float32
 	trailBubbles    []*trailBubble
+	Collider        CircleShape
 }
 
 func (p *Player) spawnTrail() {
@@ -88,6 +89,17 @@ func NewPlayer(x, y, base, height, acceleratePower, deceleratePower float32, vel
 		AcceleratePower: acceleratePower,
 		DeceleratePower: deceleratePower,
 		trailBubbles:    make([]*trailBubble, 0, maxTrailBubbles), // Initialize empty slice for trailBubbles
+		Collider: CircleShape{
+			Shape: Shape{
+				Position: Vec2{
+					X: x,
+					Y: y,
+				},
+				StrokeWidth: 2,
+				Color:       color.RGBA{0, 255, 255, 255},
+			},
+			Radius: height / 2,
+		},
 	}
 	// Define the death event handler
 	return player
@@ -132,6 +144,8 @@ func (p *Player) handleMovement() {
 
 	p.shape.Position.X += p.Velocity.X
 	p.shape.Position.Y += p.Velocity.Y
+	p.Collider.Position.X = p.shape.Position.X
+	p.Collider.Position.Y = p.shape.Position.Y
 
 	bounceBack(&p.shape.Position, &p.Velocity, constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT)
 }
@@ -142,6 +156,7 @@ func (p *Player) Draw(screen *ebiten.Image) {
 	for _, v := range p.trailBubbles {
 		v.shape.Draw(screen)
 	}
+	p.Collider.Draw(screen)
 }
 
 // Function to handle bouncing at the screen edges

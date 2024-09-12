@@ -14,6 +14,7 @@ type Asteroid struct {
 	CircleShape
 	Velocity       Vec2
 	OnOutOfScrFunc OnOutOfScreen
+	Collider       CircleShape
 }
 
 func (ast *Asteroid) Draw(dest *ebiten.Image) {
@@ -23,6 +24,8 @@ func (ast *Asteroid) Draw(dest *ebiten.Image) {
 func (a *Asteroid) Update() error {
 	a.CircleShape.Shape.Position.X += a.Velocity.X
 	a.CircleShape.Shape.Position.Y += a.Velocity.Y
+	a.Collider.Shape.Position.X += a.Velocity.X
+	a.Collider.Shape.Position.Y += a.Velocity.Y
 
 	// Check if asteroid is within the Kill Zone (beyond the screen + Safe Zone)
 	if a.CircleShape.Shape.Position.X < -constants.ASTEROID_MAX_RADIUS*2 ||
@@ -88,17 +91,20 @@ func NewAsteroidTowardsWindow(onOutOfScreen OnOutOfScreen) *Asteroid {
 	// Generate a random radius for the asteroid
 	radius := rand.Float32()*(constants.ASTEROID_MAX_RADIUS-constants.ASTEROID_MIN_RADIUS) + constants.ASTEROID_MIN_RADIUS
 
+	circleShape := CircleShape{
+		Shape: Shape{
+			Position:    position,
+			StrokeWidth: 1,
+			Color:       color.RGBA{255, 255, 255, 255},
+		},
+		Radius: radius,
+	}
+
 	// Return the new asteroid with the calculated position and velocity
 	return &Asteroid{
-		CircleShape: CircleShape{
-			Shape: Shape{
-				Position:    position,
-				StrokeWidth: 1,
-				Color:       color.RGBA{255, 255, 255, 255},
-			},
-			Radius: radius,
-		},
+		CircleShape:    circleShape,
 		Velocity:       velocity,
 		OnOutOfScrFunc: onOutOfScreen,
+		Collider:       circleShape,
 	}
 }

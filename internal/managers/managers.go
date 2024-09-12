@@ -1,7 +1,6 @@
 package managers
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -12,6 +11,10 @@ import (
 type AsteroidManager struct {
 	asteroids     []*gameobjects.Asteroid
 	lastSpawnTime time.Time
+}
+
+func (am *AsteroidManager) GetAsteroids() *[]*gameobjects.Asteroid {
+	return &am.asteroids
 }
 
 func NewAsteroidManager() *AsteroidManager {
@@ -29,7 +32,6 @@ func (am *AsteroidManager) Update() error {
 		}
 	}
 	timeSinceLastSpawn := time.Since(am.lastSpawnTime)
-	println(timeSinceLastSpawn.Seconds())
 	if timeSinceLastSpawn.Seconds() >= constants.ASTEROID_SPAWN_RATE {
 		am.SpawnAsteroid()
 	}
@@ -44,7 +46,6 @@ func (am *AsteroidManager) Draw(dest *ebiten.Image) {
 
 func (am *AsteroidManager) SpawnAsteroid() {
 	onOutOfScreen := func(as *gameobjects.Asteroid) {
-		fmt.Printf("%v: is going to be destroyed!", as)
 		for i, v := range am.asteroids {
 			if v == as {
 				am.asteroids = append(am.asteroids[:i], am.asteroids[i+1:]...)
