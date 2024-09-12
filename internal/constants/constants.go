@@ -1,4 +1,4 @@
-package gamelogic
+package constants
 
 const (
 	SCREEN_WIDTH  = 1280

@@ -6,7 +6,7 @@ import (
 	"math/rand"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/zdsdd/asteroids/internal/gamelogic"
+	"github.com/zdsdd/asteroids/internal/constants"
 )
 
 const (
@@ -133,7 +133,7 @@ func (p *Player) handleMovement() {
 	p.shape.Position.X += p.Velocity.X
 	p.shape.Position.Y += p.Velocity.Y
 
-	bounceBack(&p.shape.Position, &p.Velocity, gamelogic.SCREEN_WIDTH, gamelogic.SCREEN_HEIGHT)
+	bounceBack(&p.shape.Position, &p.Velocity, constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT)
 }
 
 // Draw method for the Player (draws an isosceles triangle)
