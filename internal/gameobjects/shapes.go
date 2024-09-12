@@ -9,11 +9,12 @@ import (
 )
 
 type CircleShape struct {
-	X, Y, Radius float32
+	X, Y, Radius, StrokeWidth float32
+	Color                     color.RGBA
 }
 
 func (cs *CircleShape) Draw(dest *ebiten.Image) {
-	vector.StrokeCircle(dest, cs.X, cs.Y, cs.Radius, 10, color.RGBA{255, 0, 0, 255}, false)
+	vector.StrokeCircle(dest, cs.X, cs.Y, cs.Radius, cs.StrokeWidth, cs.Color, false)
 }
 
 type TriangleShape struct {
