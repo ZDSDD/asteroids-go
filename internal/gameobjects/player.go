@@ -17,6 +17,27 @@ type Player struct {
 	trailBubbles    []*trailBubble
 }
 
+func (p *Player) spawnTrail() {
+	if len(p.trailBubbles) == maxTrailBubbles {
+		return
+	}
+	onDeath := func(tb *trailBubble) error {
+		bubbles := make([]*trailBubble, 0, maxTrailBubbles)
+		// Remove bubble from the list here
+		for i, bubble := range p.trailBubbles {
+			if bubble != tb {
+				bubbles = append(bubbles, p.trailBubbles[i])
+			}
+		}
+		p.trailBubbles = bubbles
+		return nil
+	}
+
+	bubble := NewTrailBubble(p.shape.Position.X, p.shape.Position.Y, p.Velocity, onDeath)
+	p.trailBubbles = append(p.trailBubbles, bubble)
+
+}
+
 // NewPlayer creates and initializes a new Player object.
 func NewPlayer(x, y, base, height, acceleratePower, deceleratePower float32, velocity Vec2) *Player {
 	player := &Player{
@@ -31,27 +52,6 @@ func NewPlayer(x, y, base, height, acceleratePower, deceleratePower float32, vel
 		trailBubbles:    make([]*trailBubble, 0, maxTrailBubbles), // Initialize empty slice for trailBubbles
 	}
 	// Define the death event handler
-	onDeath := func(tb *trailBubble) error {
-		fmt.Println("Bubble died:", tb)
-		bubbles := make([]*trailBubble, 0, maxTrailBubbles)
-		// Remove bubble from the list here
-		for i, bubble := range player.trailBubbles {
-			if bubble != tb {
-				bubbles = append(bubbles, player.trailBubbles[i])
-			}
-		}
-		player.trailBubbles = bubbles
-		fmt.Println("Ive been here u know")
-		return nil
-	}
-
-	// Optionally, initialize a few bubbles in the trail
-	// Example of creating some initial trail bubbles
-	for i := 0; i < 5; i++ {
-		bubble := NewTrailBubble(x, y, onDeath)
-		player.trailBubbles = append(player.trailBubbles, bubble)
-	}
-
 	return player
 }
 
@@ -74,6 +74,8 @@ func (p *Player) handleMovement() {
 
 		p.Velocity.X += forwardX * p.AcceleratePower
 		p.Velocity.Y += forwardY * p.AcceleratePower
+		fmt.Println(len(p.trailBubbles))
+		p.spawnTrail()
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyDown) || ebiten.IsKeyPressed(ebiten.KeyS) {
 
