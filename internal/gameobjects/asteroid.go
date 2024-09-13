@@ -26,8 +26,6 @@ func (ast *Asteroid) Draw(dest *ebiten.Image) {
 }
 
 func (ast *Asteroid) Brake() {
-
-	//todo: handle breaking into smaller pieces
 	if ast.OnKill != nil {
 		ast.OnKill(ast)
 	}
@@ -110,6 +108,11 @@ func NewAsteroidTowardsWindow(onKill OnKillFunc, onOutOfScreen OnOutOfScreen) *A
 
 	// Generate a random radius for the asteroid
 	radius := rand.Float32()*(constants.ASTEROID_MAX_RADIUS-constants.ASTEROID_MIN_RADIUS) + constants.ASTEROID_MIN_RADIUS
+
+	return NewAsteroid(onKill, onOutOfScreen, velocity, position, radius)
+}
+
+func NewAsteroid(onKill OnKillFunc, onOutOfScreen OnOutOfScreen, velocity, position Vec2, radius float32) *Asteroid {
 
 	circleShape := CircleShape{
 		Shape: Shape{

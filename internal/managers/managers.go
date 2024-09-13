@@ -2,6 +2,8 @@ package managers
 
 import (
 	"fmt"
+	"math"
+	"math/rand"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -54,8 +56,39 @@ func (am *AsteroidManager) SpawnAsteroid() {
 		}
 	}
 	onKillFunc := func(as *gameobjects.Asteroid) {
-		fmt.Printf("Asteroid that was killed had %v radius. WHat should happen to it?\n", as.Radius)
-		am.asteroids, _ = sliceutils.RemoveItem(am.asteroids, func(a *gameobjects.Asteroid) bool { return a == as })
+		fmt.Printf("Asteroid that was killed had %v radius. What should happen to it?\n", as.Radius)
+
+		// Seed the random number generator
+		rand.Seed(time.Now().UnixNano())
+
+		if as.Radius/2 >= constants.ASTEROID_MIN_RADIUS {
+			// Generate random angles for splitting
+			randomAngle1 := rand.Float64() * math.Pi // random angle between 0 and Pi
+			randomAngle2 := rand.Float64() * math.Pi // another random angle between 0 and Pi
+
+			// Create two new asteroids with random rotations
+			asteroid1 := gameobjects.NewAsteroid(
+				as.OnKill,
+				as.OnOutOfScrFunc,
+				as.Velocity.Rotate(randomAngle1),
+				as.Position,
+				as.Radius/2,
+			)
+			asteroid2 := gameobjects.NewAsteroid(
+				as.OnKill,
+				as.OnOutOfScrFunc,
+				as.Velocity.Rotate(-randomAngle2),
+				as.Position,
+				as.Radius/2,
+			)
+
+			// Add new asteroids to the manager
+			am.asteroids = append(am.asteroids, asteroid1)
+			am.asteroids = append(am.asteroids, asteroid2)
+		}
+
+		// Remove the original asteroid
+		am.RemoveAsteroid(as)
 	}
 
 	asteroid := gameobjects.NewAsteroidTowardsWindow(onKillFunc, onOutOfScreen)
@@ -63,6 +96,6 @@ func (am *AsteroidManager) SpawnAsteroid() {
 	am.lastSpawnTime = time.Now()
 }
 
-func (am *AsteroidManager) RemoveAstroid(a *gameobjects.Asteroid) {
+func (am *AsteroidManager) RemoveAsteroid(a *gameobjects.Asteroid) {
 	am.asteroids, _ = sliceutils.RemoveItem(am.asteroids, func(ast *gameobjects.Asteroid) bool { return ast == a })
 }
