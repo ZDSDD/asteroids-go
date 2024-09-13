@@ -31,3 +31,8 @@ type Vec2 struct {
 func Distance(p1, p2 Vec2) float32 {
 	return float32(math.Sqrt(float64((p2.X-p1.X)*(p2.X-p1.X) + (p2.Y-p1.Y)*(p2.Y-p1.Y))))
 }
+
+type Collidable interface {
+	GetPosition() Vec2
+	GetRadius() float32
+}

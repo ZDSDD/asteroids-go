@@ -9,6 +9,7 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/zdsdd/asteroids/internal/constants"
+	"github.com/zdsdd/asteroids/internal/sliceutils"
 )
 
 const (
@@ -109,6 +110,10 @@ func NewPlayer(x, y, base, height, acceleratePower, deceleratePower float32, vel
 	return player
 }
 
+func (p *Player) RemoveBullet(b *Bullet) {
+	p.Bullets, _ = sliceutils.RemoveItem(p.Bullets, func(bullet *Bullet) bool { return b == bullet })
+}
+
 // Update method for the Player to move and rotate based on input
 func (p *Player) Update() error {
 	p.handleMovement()
@@ -204,28 +209,37 @@ func bounceBack(position *Vec2, velocity *Vec2, screenWidth, screenHeight float3
 type Bullet = Asteroid
 
 func (p *Player) spawnBullet() *Bullet {
-	fmt.Println("Spawned bulled!!")
 	p.LastTimeShoot = time.Now()
 	shotVector := p.getForwardVector()
 	shotVector.X *= constants.BULLET_SPEED
 	shotVector.Y *= constants.BULLET_SPEED
-
-	return &Bullet{
-		CircleShape: CircleShape{
-			Shape: Shape{
-				Position: Vec2{
-					X: p.shape.Position.X,
-					Y: p.shape.Position.Y,
-				},
-				StrokeWidth: 1,
-				Color:       color.RGBA{100, 10, 200, 255},
+	shape := CircleShape{
+		Shape: Shape{
+			Position: Vec2{
+				X: p.shape.Position.X,
+				Y: p.shape.Position.Y,
 			},
-			Radius: 5,
+			StrokeWidth: 1,
+			Color:       color.RGBA{100, 10, 200, 255},
 		},
+		Radius: 5,
+	}
+	return &Bullet{
+		CircleShape: shape,
+
 		Velocity: shotVector,
+		Collider: shape,
 	}
 }
 
 func (p *Player) GetBullets() []*Bullet {
 	return p.Bullets
+}
+
+func (p *Player) GetPosition() Vec2 {
+	return p.Collider.Position
+}
+
+func (p *Player) GetRadius() float32 {
+	return p.Collider.Radius
 }

@@ -10,15 +10,35 @@ import (
 
 type OnOutOfScreen func(*Asteroid)
 
+type OnKillFunc func(*Asteroid)
+
 type Asteroid struct {
 	CircleShape
 	Velocity       Vec2
 	OnOutOfScrFunc OnOutOfScreen
 	Collider       CircleShape
+	OnKill         OnKillFunc
 }
 
 func (ast *Asteroid) Draw(dest *ebiten.Image) {
 	ast.CircleShape.Draw(dest)
+	// ast.Collider.Draw(dest)
+}
+
+func (ast *Asteroid) Brake() {
+
+	//todo: handle breaking into smaller pieces
+	if ast.OnKill != nil {
+		ast.OnKill(ast)
+	}
+}
+
+func (ast *Asteroid) GetPosition() Vec2 {
+	return ast.Collider.Position
+}
+
+func (ast *Asteroid) GetRadius() float32 {
+	return ast.Collider.Radius
 }
 
 func (a *Asteroid) Update() error {
@@ -42,7 +62,7 @@ func (a *Asteroid) Update() error {
 	return nil
 }
 
-func NewAsteroidTowardsWindow(onOutOfScreen OnOutOfScreen) *Asteroid {
+func NewAsteroidTowardsWindow(onKill OnKillFunc, onOutOfScreen OnOutOfScreen) *Asteroid {
 	var position Vec2
 	var velocity Vec2
 
@@ -99,12 +119,12 @@ func NewAsteroidTowardsWindow(onOutOfScreen OnOutOfScreen) *Asteroid {
 		},
 		Radius: radius,
 	}
-
 	// Return the new asteroid with the calculated position and velocity
 	return &Asteroid{
 		CircleShape:    circleShape,
 		Velocity:       velocity,
 		OnOutOfScrFunc: onOutOfScreen,
 		Collider:       circleShape,
+		OnKill:         onKill,
 	}
 }

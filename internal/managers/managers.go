@@ -1,11 +1,13 @@
 package managers
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/zdsdd/asteroids/internal/constants"
 	"github.com/zdsdd/asteroids/internal/gameobjects"
+	"github.com/zdsdd/asteroids/internal/sliceutils"
 )
 
 type AsteroidManager struct {
@@ -13,10 +15,9 @@ type AsteroidManager struct {
 	lastSpawnTime time.Time
 }
 
-func (am *AsteroidManager) GetAsteroids() *[]*gameobjects.Asteroid {
-	return &am.asteroids
+func (am *AsteroidManager) GetAsteroids() []*gameobjects.Asteroid {
+	return am.asteroids
 }
-
 func NewAsteroidManager() *AsteroidManager {
 	asteroids := make([]*gameobjects.Asteroid, 0)
 	return &AsteroidManager{
@@ -52,8 +53,16 @@ func (am *AsteroidManager) SpawnAsteroid() {
 			}
 		}
 	}
+	onKillFunc := func(as *gameobjects.Asteroid) {
+		fmt.Printf("Asteroid that was killed had %v radius. WHat should happen to it?\n", as.Radius)
+		am.asteroids, _ = sliceutils.RemoveItem(am.asteroids, func(a *gameobjects.Asteroid) bool { return a == as })
+	}
 
-	asteroid := gameobjects.NewAsteroidTowardsWindow(onOutOfScreen)
+	asteroid := gameobjects.NewAsteroidTowardsWindow(onKillFunc, onOutOfScreen)
 	am.asteroids = append(am.asteroids, asteroid)
 	am.lastSpawnTime = time.Now()
+}
+
+func (am *AsteroidManager) RemoveAstroid(a *gameobjects.Asteroid) {
+	am.asteroids, _ = sliceutils.RemoveItem(am.asteroids, func(ast *gameobjects.Asteroid) bool { return ast == a })
 }
